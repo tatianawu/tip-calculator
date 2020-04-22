@@ -1,15 +1,14 @@
 package edu.stanford.twu99.tippy
 
 import android.animation.ArgbEvaluator
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.View
 import android.widget.SeekBar
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val TAG = "MainActivity"
@@ -21,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Set initial screen
         seekBarTip.progress = INITIAL_TIP_PERCENT
         tvTipPercent.text = "$INITIAL_TIP_PERCENT%"
         updateTipDescription(INITIAL_TIP_PERCENT)
@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
 
@@ -45,26 +44,20 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        buttonClearTip.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                etBase.text = Editable.Factory.getInstance().newEditable("")
-            }
-        })
+        buttonClearTip.setOnClickListener { etBase.setText("", TextView.BufferType.EDITABLE) }
 
     }
 
     private fun updateTipDescription(tipPercent: Int) {
-        val tipDescription: String
-        when (tipPercent) {
-            in 0..9 -> tipDescription = "Poor"
-            in 10..14 -> tipDescription = "Acceptable"
-            in 15..19 -> tipDescription = "Good"
-            in 20..24 -> tipDescription = "Great"
-            else -> tipDescription = "Amazing"
+        val tipDescription: String = when (tipPercent) {
+            in 0..9 -> "Poor"
+            in 10..14 -> "Acceptable"
+            in 15..19 -> "Good"
+            in 20..24 -> "Great"
+            else -> "Amazing"
         }
         tvTipDescription.text = tipDescription
 
@@ -77,20 +70,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun computeTipAndTotal() {
-        // Check if base is empty
         if (etBase.text.isEmpty()) {
             tvTipAmount.text = ""
             tvTotalAmount.text = ""
             return
         }
 
-        // Get the values of the tip and total
         val baseAmount = etBase.text.toString().toDouble()
         val tipPercent = seekBarTip.progress
         val tipAmount = baseAmount * tipPercent / 100
         val totalAmount = baseAmount + tipAmount
 
-        // Place in values in the TextViews
         tvTipAmount.text = "%.2f".format(tipAmount)
         tvTotalAmount.text = "%.2f".format(totalAmount)
     }
